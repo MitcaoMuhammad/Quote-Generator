@@ -1,0 +1,28 @@
+.icon-button {
+	background: transparent;
+	border: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	cursor: pointer;
+	color: white;
+	font-family: 'JetBrains Mono', monospace;
+	font-size: 12px;
+	opacity: 0.8;
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.icon-button:hover {
+	opacity: 1;
+	transform: scale(1.05);
+}
+
+.icon-image {
+	width: 36px;
+	height: 29px;
+}
+
+.icon-label {
+	margin-top: 2px;
+}

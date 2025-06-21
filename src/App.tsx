@@ -1,35 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import IconButton from './components/iconButtons/IconButtons'
+import QuoteBox from './components/QuoteBox/QuoteBox'
+import MyQuote from './page/MyQuote/MyQuote'
+import PageTransition from './components/PageTransition/PageTransition'
+
+type Quote = {
+	text: string
+	author: string
+	date: string
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+	const [currentPage, setCurrentPage] = useState<'home' | 'myquote'>('home')
+	const [savedQuotes, setSavedQuotes] = useState<Quote[]>([])
+	const [currentQuote, setCurrentQuote] = useState<Quote>({
+		text: 'Click the random button to see your saved quotes',
+		author: 'Quote Generator',
+		date: new Date().toLocaleDateString(),
+	})
+	const [isTransitioning, setIsTransitioning] = useState(false)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	useEffect(() => {
+		setIsTransitioning(true)
+	}, [currentPage])
+
+	const handleQuoteIconClick = () => {
+		setCurrentPage(currentPage === 'home' ? 'myquote' : 'home')
+	}
+
+	const handleRandomQuote = () => {
+		if (savedQuotes.length > 0) {
+			const randomIndex = Math.floor(Math.random() * savedQuotes.length)
+			setCurrentQuote(savedQuotes[randomIndex])
+		}
+	}
+
+	return (
+		<div className='app'>
+			<div
+				className={`quote-icon ${currentPage === 'myquote' ? 'rotated' : ''}`}
+			>
+				<IconButton
+					icon='quote.svg'
+					alt='Navigation icon'
+					onClick={handleQuoteIconClick}
+				/>
+			</div>
+
+			<PageTransition
+				isVisible={currentPage === 'home'}
+				direction={currentPage === 'home' ? 'left' : 'right'}
+			>
+				<QuoteBox
+					quote={currentQuote}
+					onRandomClick={handleRandomQuote}
+					hasQuotes={savedQuotes.length > 0}
+				/>
+			</PageTransition>
+
+			<PageTransition
+				isVisible={currentPage === 'myquote'}
+				direction={currentPage === 'home' ? 'right' : 'left'}
+			>
+				<MyQuote
+					quotes={savedQuotes}
+					onQuoteAdd={quote => setSavedQuotes([...savedQuotes, quote])}
+					onQuoteDelete={index => {
+						setSavedQuotes(savedQuotes.filter((_, i) => i !== index))
+					}}
+				/>
+			</PageTransition>
+		</div>
+	)
 }
 
 export default App
